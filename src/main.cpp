@@ -37,7 +37,7 @@ void setup() {
   client.setServer(mqtt_server, 1883); 
   client.setCallback(callback); 
 
-  Wire.begin(); //Wire init, adding the I2C bus.  Wire初始化, 加入i2c总线
+  Wire.begin(); //Wire init, adding the I2C bus.
   qmp6988.init();
 
   
@@ -50,9 +50,9 @@ void loop() {
   client.loop();  //This function is called periodically to allow clients to process incoming messages and maintain connections to the server.
 
   pressure = qmp6988.calcPressure();
-  if(sht30.get()==0){ //Obtain the data of shT30.  获取sht30的数据
-    tmp = sht30.cTemp;  //Store the temperature obtained from shT30.  将sht30获取到的温度存储
-    hum = sht30.humidity; //Store the humidity obtained from the SHT30.  将sht30获取到的湿度存储
+  if(sht30.get()==0){ //Obtain the data of shT30.
+    tmp = sht30.cTemp;  //Store the temperature obtained from shT30.
+    hum = sht30.humidity; //Store the humidity obtained from the SHT30. 
   }else{
     tmp=0,hum=0;
   }
