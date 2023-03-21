@@ -11,7 +11,6 @@ QMP6988 qmp6988;
 
 float tmp = 0.0;
 float hum = 0.0;
-float pressure = 0.0;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -49,10 +48,10 @@ void loop() {
   }
   client.loop();  //This function is called periodically to allow clients to process incoming messages and maintain connections to the server.
 
-  pressure = qmp6988.calcPressure();
   if(sht30.get()==0){ //Obtain the data of shT30.
     tmp = sht30.cTemp;  //Store the temperature obtained from shT30.
     hum = sht30.humidity; //Store the humidity obtained from the SHT30. 
+    
   }else{
     tmp=0,hum=0;
   }
@@ -62,9 +61,9 @@ void loop() {
     lastMsg = now;
     ++value;
     snprintf (msg, MSG_BUFFER_SIZE, "%.2f", tmp);
-    client.publish("m5core2/temp", msg);
+    client.publish("rooms/temp", msg);
     snprintf (msg, MSG_BUFFER_SIZE, "%.2f", hum);
-    client.publish("m5core2/hum", msg);
+    client.publish("rooms/hum", msg);
   }
 }
 
