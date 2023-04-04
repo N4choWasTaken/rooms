@@ -1,0 +1,2 @@
+telegram-apikey = YOURAPIKEY
+mqtt-url = tcp://HOST:1883
