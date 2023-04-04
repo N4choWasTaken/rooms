@@ -47,7 +47,7 @@ public class Main {
         Mqtt mqttClient = new Mqtt(config.getProperty("mqtt-url"), "runner-12");
         try {
             mqttClient.start();
-            mqttClient.subscribe("alp/m5core2/#");
+            mqttClient.subscribe("rooms/#");
             mqttClient.publish("M5Stack", "test");
         } catch (MqttException e) {
             e.printStackTrace();
@@ -56,10 +56,10 @@ public class Main {
         mqttClient.addHandler(new BiConsumer<String, MqttMessage>() {
             @Override
             public void accept(String s, MqttMessage mqttMessage) {
-                if(s.equals("alp/m5core2/temp")) {
+                if(s.equals("rooms/temp")) {
                     temperature = Double.parseDouble(mqttMessage.toString());
                 }
-                if(s.equals("alp/m5core2/hum")) {
+                if(s.equals("rooms/hum")) {
                     humidity = Double.parseDouble(mqttMessage.toString());
                 }
             }
