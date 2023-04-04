@@ -43,7 +43,7 @@ extends Thread implements UpdatesListener {
                 if(!users.contains(update.message().chat().id())) {
                     users.add(update.message().chat().id());
                     SendMessage reply = new SendMessage(update.message().chat().id(),
-                            "Welcome! Use /unsubscribe to stop getting notifications.");
+                            "Welcome to Rooms! Use /unsubscribe to stop getting notifications.");
                     bot.execute(reply);
                 }else{
                     SendMessage reply = new SendMessage(update.message().chat().id(),
