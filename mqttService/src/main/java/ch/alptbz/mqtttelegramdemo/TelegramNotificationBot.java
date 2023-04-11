@@ -63,6 +63,14 @@ extends Thread implements UpdatesListener {
                     bot.execute(reply);
                 }
             }
+            if (message.startsWith("/silence")) {
+                    SendMessage reply = new SendMessage(update.message().chat().id(),
+                            " \uD83E\uDD2B Alarms silenced for 10 Minutes.");
+                    bot.execute(reply);
+            }
+            if (message.startsWith("/venting")){
+
+            }
         }
 
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
