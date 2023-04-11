@@ -15,6 +15,9 @@ float hum = 0.0;
 WiFiClient espClient;
 PubSubClient client(espClient);
 
+// Declare the mac variable as a global variable
+char macChar[18];
+
 // Configure the name and password of the connected wifi and your MQTT Serve host. 
 const char* ssid = "LERNKUBE";
 const char* password = "l3rnk4b3";
@@ -61,9 +64,15 @@ void loop() {
     lastMsg = now;
     ++value;
     snprintf (msg, MSG_BUFFER_SIZE, "%.2f", tmp);
-    client.publish("rooms/temp", msg);
-    snprintf (msg, MSG_BUFFER_SIZE, "%.2f", hum);
-    client.publish("rooms/hum", msg);
+    if(String(macChar)== "30:C6:F7:1F:22:D4") {
+      client.publish("rooms/sens1/temp", msg);
+      snprintf (msg, MSG_BUFFER_SIZE, "%.2f", hum);
+      client.publish("rooms/sens1/hum", msg);
+    } else {
+      client.publish("rooms/sens2/temp", msg);
+      snprintf (msg, MSG_BUFFER_SIZE, "%.2f", hum);
+      client.publish("rooms/sens2/hum", msg);
+    }
   }
 }
 
@@ -78,7 +87,21 @@ void setupWifi() {
     M5.Lcd.print(".");
   }
   M5.Lcd.printf("\nSuccess\n");
+
+  // Get the MAC address and print it on the display
+  uint8_t mac[6];
+  WiFi.macAddress(mac);
+  sprintf(macChar, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+  M5.Lcd.print("MAC address: ");
+  for (int i = 0; i < 6; ++i) {
+    M5.Lcd.printf("%02X", mac[i]);
+    if (i < 5) {
+      M5.Lcd.print(":");
+    }
+  }
+  M5.Lcd.println();
 }
+
 
 void callback(char* topic, byte* payload, unsigned int length) {
   M5.Lcd.print("Message arrived [");
@@ -100,7 +123,7 @@ void reConnect() {
     if (client.connect(clientId.c_str())) {
       M5.Lcd.printf("\nSuccess\n");
       // Once connected, publish an announcement to the topic. 
-      client.publish("M5Stack", "hello world");
+      client.publish("M5Stack", "Program started!");
       // ... and resubscribe. 
       client.subscribe("M5Stack");
     } else {
