@@ -77,6 +77,7 @@ public class Main {
 			try {
 				System.out.println(avgTemperature);
 				mqttClient.publish("rooms/avg/temp", String.valueOf(avgTemperature).formatted("%.2f"));
+				mqttClient.publish("rooms/avg/hum", String.valueOf(avgHumidity).formatted("%.2f"));
 			} catch (MqttException e) {
 				e.printStackTrace();
 			}
