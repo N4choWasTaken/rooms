@@ -75,7 +75,7 @@ public class Mqtt implements MqttCallback {
                         if(!client.isConnected()) {
                             client.reconnect();
                         }
-                        Thread.sleep(1000l);
+                        Thread.sleep(1000);
                     }
                 }catch(InterruptedException | MqttException e) {
                     logger.log(Level.SEVERE, "", e);
@@ -95,7 +95,7 @@ public class Mqtt implements MqttCallback {
 
     @Override
     public void connectionLost(Throwable cause) {
-        logger.log(Level.SEVERE, "", cause);
+        logger.log(Level.SEVERE, "Lost connection: ", cause);
     }
 
     @Override
