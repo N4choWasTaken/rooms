@@ -1,8 +1,5 @@
 package ch.alptbz.mqtttelegramdemo;
 
-import com.pengrad.telegrambot.request.SendAnimation;
-import com.pengrad.telegrambot.request.SendMessage;
-import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.util.Calendar;
@@ -11,8 +8,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import static ch.alptbz.mqtttelegramdemo.Main.config;
 
 public class VentingAlarmService {
 	Properties config;
@@ -70,7 +65,7 @@ public class VentingAlarmService {
 					timeAsString = timeAsString.concat(time.get(Calendar.HOUR_OF_DAY) + "-");
 					timeAsString = timeAsString.concat(String.valueOf(time.get(Calendar.MINUTE)));
 
-					bot.sendVentingNotificationToAllUsers();
+					bot.sendVentingNotificationToRandomUser();
 					try {
 						mqttClient.publish("rooms/venting/alarm", timeAsString);
 					} catch (MqttException e) {
