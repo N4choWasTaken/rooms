@@ -8,8 +8,11 @@ import com.pengrad.telegrambot.request.SendMessage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static java.lang.Math.random;
 
 public class TelegramNotificationBot
 		extends Thread implements UpdatesListener {
@@ -32,11 +35,10 @@ public class TelegramNotificationBot
 		}
 	};
 
-	public void sendVentingNotificationToAllUsers() {
-		for(Long user: users) {
-			SendMessage reply = new SendMessage(user, "It's time for some fresh air.");
+	public void sendVentingNotificationToRandomUser() {
+		Random random = new Random();
+			SendMessage reply = new SendMessage(users.get(random.nextInt(users.size())), "It's time for some fresh air.");
 			bot.execute(reply);
-		}
 	}
 
 
