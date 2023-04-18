@@ -18,7 +18,7 @@ public class Main {
 	public static double sensor2_temperature = 0;
 	public static double sensor2_humidity = 0;
 	private static Logger logger;
-	private static Properties config;
+	static Properties config;
 
 	private static boolean loadConfig() {
 		config = new Properties();
@@ -31,22 +31,23 @@ public class Main {
 		return false;
 	}
 
-	public final static void main(String[] args) throws InterruptedException {
-		ConsoleHandler ch = new ConsoleHandler();
-		ch.setLevel(Level.ALL);
-		Logger.getGlobal().addHandler(ch);
-
+	public static void main(String[] args) throws InterruptedException, MqttException {
 		logger = Logger.getLogger("main");
 
 		if (!loadConfig()) return;
 
 		logger.info("Config file loaded");
+		Mqtt mqttClient = new Mqtt(config.getProperty("mqtt-url"), "runner-12");
 
-		TelegramNotificationBot tnb = new TelegramNotificationBot(config.getProperty("telegram-apikey"));
+		VentingAlarmService ventingAlarmService = new VentingAlarmService(config, mqttClient);
+		ventingAlarmService.notifyVenting();
+
+		ConsoleHandler ch = new ConsoleHandler();
+		ch.setLevel(Level.ALL);
+		Logger.getGlobal().addHandler(ch);
 
 		logger.info("TelegramBot started");
 
-		Mqtt mqttClient = new Mqtt(config.getProperty("mqtt-url"), "runner-12");
 		try {
 			mqttClient.start();
 			mqttClient.subscribe("rooms/#");
@@ -83,7 +84,5 @@ public class Main {
 			}
 			Thread.sleep(1000);
 		}
-
 	}
-
 }
