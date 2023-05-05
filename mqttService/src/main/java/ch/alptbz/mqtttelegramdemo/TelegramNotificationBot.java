@@ -91,16 +91,6 @@ public class TelegramNotificationBot
 				timer.schedule(disableSilencingAfterTenMinutes, 10 * 60 * 1000);
 
 			}
-			if (message.startsWith("/venting")) {
-				Calendar lastVented = Calendar.getInstance();
-				ventingAlarmService.setLastVented(lastVented);
-				ventingAlarmService.notifyClosing();
-				Calendar currentTime = Calendar.getInstance();
-				SendMessage reply = new SendMessage(update.message().chat().id(),
-						"Venting event received at " + currentTime.get(Calendar.HOUR_OF_DAY) + ':' + currentTime.get(Calendar.MINUTE));
-				bot.execute(reply);
-
-			}
 		}
 		return UpdatesListener.CONFIRMED_UPDATES_ALL;
 	}
