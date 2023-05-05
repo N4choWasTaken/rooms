@@ -1,12 +1,10 @@
 package ch.alptbz.mqtttelegramdemo;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.function.BiConsumer;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,8 +44,6 @@ public class Main {
 		ch.setLevel(Level.ALL);
 		Logger.getGlobal().addHandler(ch);
 
-		logger.info("TelegramBot started");
-
 		try {
 			mqttClient.start();
 			mqttClient.subscribe("rooms/#");
@@ -74,7 +70,6 @@ public class Main {
 			double avgTemperature = (sensor1_temperature + sensor2_temperature) / 2;
 			double avgHumidity = (sensor1_humidity + sensor2_humidity) / 2;
 
-//			sendDataToGrafana(avgTemperature, avgHumidity);
 			try {
 				System.out.println(avgTemperature);
 				mqttClient.publish("rooms/avg/temp", String.valueOf(avgTemperature).formatted("%.2f"));

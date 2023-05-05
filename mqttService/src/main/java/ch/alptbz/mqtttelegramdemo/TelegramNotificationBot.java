@@ -6,24 +6,24 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static java.lang.Math.random;
-
 public class TelegramNotificationBot
 		extends Thread implements UpdatesListener {
 	boolean silenced = false;
-
 	private final TelegramBot bot;
+	private final VentingAlarmService ventingAlarmService;
 	private final List<Long> users = Collections.synchronizedList(new ArrayList<Long>());
 
-	public TelegramNotificationBot(String botToken) {
+	public TelegramNotificationBot(String botToken, VentingAlarmService ventingAlarmService) {
 		bot = new TelegramBot(botToken);
 		bot.setUpdatesListener(this);
+		this.ventingAlarmService = ventingAlarmService;
 	}
 
 	Timer timer = new Timer();
@@ -39,6 +39,12 @@ public class TelegramNotificationBot
 		Random random = new Random();
 			SendMessage reply = new SendMessage(users.get(random.nextInt(users.size())), "It's time for some fresh air.");
 			bot.execute(reply);
+	}
+
+	public void sendVentingAlarmToRandomUser() {
+		Random random = new Random();
+		SendMessage reply = new SendMessage(users.get(random.nextInt(users.size())), "It's time for some fresh air! You haven't vented for 50 min! ");
+		bot.execute(reply);
 	}
 
 
@@ -86,8 +92,12 @@ public class TelegramNotificationBot
 
 			}
 			if (message.startsWith("/venting")) {
+				Calendar lastVented = Calendar.getInstance();
+				ventingAlarmService.setLastVented(lastVented);
+				ventingAlarmService.notifyClosing();
+				Calendar currentTime = Calendar.getInstance();
 				SendMessage reply = new SendMessage(update.message().chat().id(),
-						"Venting event received");
+						"Venting event received at " + currentTime.get(Calendar.HOUR_OF_DAY) + ':' + currentTime.get(Calendar.MINUTE));
 				bot.execute(reply);
 
 			}
