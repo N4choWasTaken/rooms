@@ -4,6 +4,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Properties;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -65,6 +66,14 @@ public class Main {
 				}
 				if (topic.equals("rooms/sens2/hum")) {
 					sensor2_humidity = Double.parseDouble(mqttMessage.toString());
+				}
+				if (topic.equals("rooms/confirmation/open")) {
+					Calendar lastVented = Calendar.getInstance();
+					ventingAlarmService.setLastVented(lastVented);
+					ventingAlarmService.notifyClosing();
+				}
+				if (topic.equals("rooms/confirmation/closed")){
+
 				}
 			});
 			double avgTemperature = (sensor1_temperature + sensor2_temperature) / 2;
