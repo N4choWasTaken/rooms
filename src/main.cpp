@@ -4,6 +4,7 @@
 #include "Adafruit_Sensor.h"
 #include <Adafruit_BMP280.h>
 #include "M5_ENV.h"
+#include <Adafruit_GFX.h>
 
 SHT3X sht30;
 QMP6988 qmp6988;
@@ -16,8 +17,8 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 
 // Configure the name and password of the connected wifi and your MQTT Serve host. 
-const char* ssid = "LERNKUBE";
-const char* password = "l3rnk4b3";
+const char* ssid = "Sunrise_2.4GHz_3FD930";
+const char* password = "hmenD17cg4c5";
 const char* mqtt_server = "cloud.tbz.ch";
 
 unsigned long lastMsg = 0;
@@ -30,16 +31,15 @@ void callback(char* topic, byte* payload, unsigned int length);
 void reConnect();
 
 void setup() {
-  M5.Lcd.setTextFont(FONT2);
   M5.begin();
+  M5.Lcd.clear();
+
   setupWifi();
   client.setServer(mqtt_server, 1883); 
   client.setCallback(callback); 
 
   Wire.begin(); //Wire init, adding the I2C bus.
-  qmp6988.init();
-
-  
+  qmp6988.init();  
 }
 
 void loop() {
@@ -51,9 +51,32 @@ void loop() {
   if(sht30.get()==0){ //Obtain the data of shT30.
     tmp = sht30.cTemp;  //Store the temperature obtained from shT30.
     hum = sht30.humidity; //Store the humidity obtained from the SHT30. 
+
+    M5.Lcd.clear();
+    M5.Lcd.setCursor(10, 50);
+    M5.Lcd.printf("Temperature:%f", tmp);
+    M5.Lcd.setCursor(10, 70);
+    M5.Lcd.printf("Humidity:%f", hum);
+    M5.Buttons.draw();
+
+    M5.Buttons.update();
+    if (M5.BtnA.wasPressed()) {
+      M5.Lcd.printf("Button A was pressed.");
+      delay(1000);
+    }
     
   }else{
     tmp=0,hum=0;
+
+    M5.Lcd.setTextFont(FONT2);
+    M5.Lcd.println("rooms");
+    M5.Lcd.println(M5.BtnA.read());
+    M5.Lcd.setCursor(10, 50);
+    M5.Lcd.printf("Temperature:");
+    M5.Lcd.setCursor(10, 70);
+    M5.Lcd.printf("Humidity:");
+    M5.Buttons.draw();
+    
   }
 
   unsigned long now = millis(); //Obtain the host startup duration. 
@@ -78,6 +101,7 @@ void setupWifi() {
     M5.Lcd.print(".");
   }
   M5.Lcd.printf("\nSuccess\n");
+  M5.Lcd.clear();
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -99,6 +123,7 @@ void reConnect() {
     // Attempt to connect. 
     if (client.connect(clientId.c_str())) {
       M5.Lcd.printf("\nSuccess\n");
+      M5.Lcd.clear();
       // Once connected, publish an announcement to the topic. 
       client.publish("M5Stack", "hello world");
       // ... and resubscribe. 
