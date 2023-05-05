@@ -73,7 +73,7 @@ public class Main {
 					ventingAlarmService.notifyClosing();
 				}
 				if (topic.equals("rooms/confirmation/closed")){
-
+					ventingAlarmService.setLastVented(Calendar.getInstance());
 				}
 			});
 			double avgTemperature = (sensor1_temperature + sensor2_temperature) / 2;
