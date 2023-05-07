@@ -12,6 +12,9 @@ QMP6988 qmp6988;
 float tmp = 0.0;
 float hum = 0.0;
 
+// Declare the mac variable as a global variable
+char macChar[18];
+
 WiFiClient espClient;
 PubSubClient client(espClient);
 
@@ -121,9 +124,15 @@ void loop() {
     lastMsg = now;
     ++value;
     snprintf (msg, MSG_BUFFER_SIZE, "%.2f", tmp);
-    client.publish("rooms/temp", msg);
-    snprintf (msg, MSG_BUFFER_SIZE, "%.2f", hum);
-    client.publish("rooms/hum", msg);
+    if(String(macChar)== "30:C6:F7:1F:22:D4") {
+      client.publish("rooms/sens1/temp", msg);
+      snprintf (msg, MSG_BUFFER_SIZE, "%.2f", hum);
+      client.publish("rooms/sens1/hum", msg);
+    } else {
+      client.publish("rooms/sens2/temp", msg);
+      snprintf (msg, MSG_BUFFER_SIZE, "%.2f", hum);
+      client.publish("rooms/sens2/hum", msg);
+    }
   }
 }
 
