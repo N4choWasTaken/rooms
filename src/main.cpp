@@ -9,7 +9,6 @@
 SHT3X sht30;
 QMP6988 qmp6988;
 
-
 float tmp = 0.0;
 float hum = 0.0;
 
@@ -26,9 +25,55 @@ unsigned long lastMsg = 0;
 char msg[MSG_BUFFER_SIZE];
 int value = 0;
 
+bool openWindows = false;  // Flag to indicate if the window is open or closed
+
 void setupWifi();
 void callback(char* topic, byte* payload, unsigned int length);
 void reConnect();
+
+void drawUI(bool isOpen) {
+  M5.Lcd.clear();
+  M5.Lcd.setTextSize(2);
+  M5.Lcd.setCursor(10, 10);
+  M5.Lcd.printf("Temperature: %.2f C", tmp);
+  M5.Lcd.setCursor(10, 50);
+  M5.Lcd.printf("Humidity: %.2f %%", hum);
+
+  M5.Lcd.setTextSize(2);
+  M5.Lcd.setCursor(10, 220);
+  M5.Lcd.setTextColor(WHITE);
+  M5.Lcd.printf("Window: ");
+  if (isOpen) {
+    M5.Lcd.setTextColor(GREEN);
+    M5.Lcd.printf("Opened");
+  } else {
+    M5.Lcd.setTextColor(RED);
+    M5.Lcd.printf("Closed");
+  }
+
+  M5.Lcd.drawRect(20, 120, 100, 50, WHITE);
+  M5.Lcd.setTextSize(2);
+  M5.Lcd.setCursor(40, 135);
+  M5.Lcd.print("Button");
+
+  if (M5.Touch.ispressed()) {
+    Point touch = M5.Touch.getPressPoint();
+    int x = touch.x;
+    int y = touch.y;
+    if (x >= 20 && x <= 120 && y >= 120 && y <= 170) {
+      openWindows = !openWindows;  // Toggle the window flag
+      drawUI(openWindows);
+      if (openWindows) {
+        client.publish("rooms/window", "opened");
+      } else {
+        client.publish("rooms/window", "closed");
+      }
+      delay(1000);
+    }
+  }
+
+  delay(50);
+}
 
 void setup() {
   M5.begin();
@@ -52,32 +97,24 @@ void loop() {
     tmp = sht30.cTemp;  //Store the temperature obtained from shT30.
     hum = sht30.humidity; //Store the humidity obtained from the SHT30. 
 
-    M5.Lcd.clear();
-    M5.Lcd.setCursor(10, 50);
-    M5.Lcd.printf("Temperature:%f", tmp);
-    M5.Lcd.setCursor(10, 70);
-    M5.Lcd.printf("Humidity:%f", hum);
-    M5.Buttons.draw();
+    drawUI(openWindows);
+    
+  } else {
+    tmp = 0.0;
+    hum = 0.0;
+    drawUI(openWindows);
+  }
 
-    M5.Buttons.update();
-    if (M5.BtnA.wasPressed()) {
-      M5.Lcd.printf("Button A was pressed.");
+    if (M5.BtnA.isPressed()) {
+      openWindows = !openWindows;  // Toggle the window flag
+      drawUI(openWindows);
+      if (openWindows) {
+        client.publish("rooms/window", "opened");
+      } else {
+        client.publish("rooms/window", "closed");
+      }
       delay(1000);
     }
-    
-  }else{
-    tmp=0,hum=0;
-
-    M5.Lcd.setTextFont(FONT2);
-    M5.Lcd.println("rooms");
-    M5.Lcd.println(M5.BtnA.read());
-    M5.Lcd.setCursor(10, 50);
-    M5.Lcd.printf("Temperature:");
-    M5.Lcd.setCursor(10, 70);
-    M5.Lcd.printf("Humidity:");
-    M5.Buttons.draw();
-    
-  }
 
   unsigned long now = millis(); //Obtain the host startup duration. 
   if (now - lastMsg > 2000) {
@@ -105,13 +142,13 @@ void setupWifi() {
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
-  M5.Lcd.print("Message arrived [");
-  M5.Lcd.print(topic);
-  M5.Lcd.print("] ");
-  for (int i = 0; i < length; i++) {
-    M5.Lcd.print((char)payload[i]);
-  }
-  M5.Lcd.println();
+  //M5.Lcd.print("Message arrived [");
+  //M5.Lcd.print(topic);
+  //M5.Lcd.print("] ");
+  //for (int i = 0; i < length; i++) {
+  //  M5.Lcd.print((char)payload[i]);
+  //}
+  //M5.Lcd.println();
 }
 
 void reConnect() {
@@ -133,6 +170,6 @@ void reConnect() {
       M5.Lcd.print(client.state());
       M5.Lcd.println("try again in 5 seconds");
       delay(5000);
-    }
+    } 
   }
 }
