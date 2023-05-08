@@ -34,7 +34,7 @@ void setupWifi();
 void callback(char* topic, byte* payload, unsigned int length);
 void reConnect();
 
-void drawUI(bool isOpen) {
+void drawUI(bool isOpen, bool showButton) {
   M5.Lcd.clear();
   M5.Lcd.setTextSize(2);
   M5.Lcd.setCursor(10, 10);
@@ -54,24 +54,26 @@ void drawUI(bool isOpen) {
     M5.Lcd.printf("Closed");
   }
 
-  M5.Lcd.drawRect(20, 120, 100, 50, WHITE);
-  M5.Lcd.setTextSize(2);
-  M5.Lcd.setCursor(40, 135);
-  M5.Lcd.print("Button");
+  if(showButton) {
+    M5.Lcd.drawRect(20, 120, 100, 50, WHITE);
+    M5.Lcd.setTextSize(2);
+    M5.Lcd.setCursor(40, 135);
+    M5.Lcd.print("Button");
 
-  if (M5.Touch.ispressed()) {
-    Point touch = M5.Touch.getPressPoint();
-    int x = touch.x;
-    int y = touch.y;
-    if (x >= 20 && x <= 120 && y >= 120 && y <= 170) {
-      openWindows = !openWindows;  // Toggle the window flag
-      drawUI(openWindows);
-      if (openWindows) {
-        client.publish("rooms/window", "opened");
-      } else {
-        client.publish("rooms/window", "closed");
+    if (M5.Touch.ispressed()) {
+      Point touch = M5.Touch.getPressPoint();
+      int x = touch.x;
+      int y = touch.y;
+      if (x >= 20 && x <= 120 && y >= 120 && y <= 170) {
+        openWindows = !openWindows;  // Toggle the window flag
+        drawUI(openWindows, showButton);
+        if (openWindows) {
+          client.publish("rooms/window", "opened");
+        } else {
+          client.publish("rooms/window", "closed");
+        }
+        delay(1000);
       }
-      delay(1000);
     }
   }
 
@@ -85,6 +87,7 @@ void setup() {
   setupWifi();
   client.setServer(mqtt_server, 1883); 
   client.setCallback(callback); 
+  client.subscribe("/rooms/venting");
 
   Wire.begin(); //Wire init, adding the I2C bus.
   qmp6988.init();  
@@ -100,24 +103,13 @@ void loop() {
     tmp = sht30.cTemp;  //Store the temperature obtained from shT30.
     hum = sht30.humidity; //Store the humidity obtained from the SHT30. 
 
-    drawUI(openWindows);
+    drawUI(openWindows, false);
     
   } else {
     tmp = 0.0;
     hum = 0.0;
-    drawUI(openWindows);
+    drawUI(openWindows, false);
   }
-
-    if (M5.BtnA.isPressed()) {
-      openWindows = !openWindows;  // Toggle the window flag
-      drawUI(openWindows);
-      if (openWindows) {
-        client.publish("rooms/window", "opened");
-      } else {
-        client.publish("rooms/window", "closed");
-      }
-      delay(1000);
-    }
 
   unsigned long now = millis(); //Obtain the host startup duration. 
   if (now - lastMsg > 2000) {
@@ -136,6 +128,19 @@ void loop() {
   }
 }
 
+void callback(char* topic, byte* payload, unsigned int length) {
+  String message;
+  for (int i = 0; i < length; i++) {
+    message += (char)payload[i];
+  }
+  if(message == "alarm") {
+    drawUI(true, true);
+  }
+
+  //TODO Here i need the correct topic together with maurus
+}
+
+
 void setupWifi() {
   delay(10);
   M5.Lcd.printf("Connecting to %s",ssid);
@@ -148,16 +153,6 @@ void setupWifi() {
   }
   M5.Lcd.printf("\nSuccess\n");
   M5.Lcd.clear();
-}
-
-void callback(char* topic, byte* payload, unsigned int length) {
-  //M5.Lcd.print("Message arrived [");
-  //M5.Lcd.print(topic);
-  //M5.Lcd.print("] ");
-  //for (int i = 0; i < length; i++) {
-  //  M5.Lcd.print((char)payload[i]);
-  //}
-  //M5.Lcd.println();
 }
 
 void reConnect() {
