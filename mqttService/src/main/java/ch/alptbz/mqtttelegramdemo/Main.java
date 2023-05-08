@@ -67,13 +67,17 @@ public class Main {
 				if (topic.equals("rooms/sens2/hum")) {
 					sensor2_humidity = Double.parseDouble(mqttMessage.toString());
 				}
-				if (topic.equals("rooms/confirmation/open")) {
+				if (topic.equals("rooms/windows")) {
+					String message = mqttMessage.toString();
+					if (message.equals("opened")) {
+
+					} else if (message.equals("closed")) {
+						ventingAlarmService.setLastVented(Calendar.getInstance());
+
+					}
 					Calendar lastVented = Calendar.getInstance();
 					ventingAlarmService.setLastVented(lastVented);
 					ventingAlarmService.notifyClosing();
-				}
-				if (topic.equals("rooms/confirmation/closed")){
-					ventingAlarmService.setLastVented(Calendar.getInstance());
 				}
 			});
 			double avgTemperature = (sensor1_temperature + sensor2_temperature) / 2;

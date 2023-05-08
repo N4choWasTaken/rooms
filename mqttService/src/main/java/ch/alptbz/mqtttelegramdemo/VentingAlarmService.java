@@ -52,7 +52,7 @@ public class VentingAlarmService {
 					String timeAsString = buildTimeStamp(time);
 					bot.sendVentingNotificationToRandomUser();
 					try {
-						mqttClient.publish("rooms/venting/notification", timeAsString);
+						mqttClient.publish("rooms/venting", "notification");
 					} catch (MqttException e) {
 						e.printStackTrace();
 					}
@@ -77,7 +77,7 @@ public class VentingAlarmService {
 			public void run() {
 				String timeAsString = buildTimeStamp(closingTime);
 				try {
-					mqttClient.publish("rooms/venting/closing", timeAsString);
+					mqttClient.publish("rooms/venting", "alarm");
 				} catch (MqttException e) {
 					e.printStackTrace();
 				}
