@@ -21,8 +21,29 @@ Aus diesen Werten wird für beide Messgrössen ein Durchschnitt berechnet, welch
 
 ## Benachrichtigungen
 Im Backend können Zeiten festgelegt werden, an denen mittels Telegram Chat und visueller Zeichen die Benutzer  aufgefordert werden zu Lüften. Beim Telegram Chat wird jeweils nur ein Nutzer aufgefordert die Fenster zu öffnen. Nach 5 minuten werden die nutzer mittels Visueller Signale aufgefordert die Fenster wieder zu schliessen. 
-Unabhänig von den definierten Zeiten werden die Nutzer nach 50 minuten wiederum per Telegram und Visueller Signale aufgefordert zu lüften. 
-
-Um die Benachrigtigungen zu erhalten muss im Kanal des Telegram Bots `@tbzRoomBot` `/subscribe` gesendet werden. 
+Unabhänig von den definierten Zeiten werden die Nutzer nach 50 minuten wiederum per Telegram und Visueller Signale aufgefordert zu lüften. Dies wird im Code als "Alarm" bezeichnet
 
 Die Zeiten, an denen gelüftet werden soll, können in der Klasse `VentingAlarmService` definiert werden. 
+
+### Telegram
+Um die Benachrigtigungen zu erhalten muss im Kanal des Telegram Bots `@tbzRoomBot` `/subscribe` gesendet werden. 
+
+### Core2
+Damit auch die Core2-Geräte die Aufforderungen zum Lüften anzeigen können. Werden ebenfalls MQTT-Nachrichten verwendet. Nachfolgend die Nachrichten für die Entsprechenden Ereignisse.
+| Ereignis | Topic | Message |
+|--------|----------|-------|
+|Benachrichtigung nach Plan|`rooms/venting`|`notification`|
+|Alarm nach 50 Minuten|`rooms/venting`|`alarm`|
+
+Auf den Core2 kann der User quittieren, dass er die Fenster geöffnet bzw. geschlossen hat. Auch diese ereignisse werden auf ein entsprechendes MQTT-Topic geschrieben. Nachfolgend die Nachrichtend für die Entsorechenden Ereignisse.
+| Ereignis | Topic | Message |
+|--------|----------|-------|
+|Fenster geöffnet|`rooms/windows`|`opened`|
+|Fenster geschlossen|`rooms/venting`|`closed`|
+
+
+# Grafana
+
+Mittels Grafana werden die gemessenen Daten auf einem Dashboard dargestellt. Um es einfach zu halten liest das Dashboard die Werte direkt von den `rooms/avg/*`   Topics. Die Temperatur- und Luftfeuchtigkeitswerte werden in separaten Diagrammen dargestellt.
+
+Da das Dashboard auch auf die Topics, welche Benachrichtigungen für die Benutzer beinhalten, höhrt, kann ich Grafana Dashboard auch abgelesen werden, wann eine Benachrichtigung versendet wurde.
