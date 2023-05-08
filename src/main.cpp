@@ -58,7 +58,7 @@ void drawUI(bool isOpen, bool showButton) {
     M5.Lcd.drawRect(20, 120, 100, 50, WHITE);
     M5.Lcd.setTextSize(2);
     M5.Lcd.setCursor(40, 135);
-    M5.Lcd.print("Button");
+    M5.Lcd.print("Opened/Closed window");
 
     if (M5.Touch.ispressed()) {
       Point touch = M5.Touch.getPressPoint();
@@ -136,10 +136,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   if(message == "alarm") {
     drawUI(true, true);
   }
-
-  //TODO Here i need the correct topic together with maurus
 }
-
 
 void setupWifi() {
   delay(10);
