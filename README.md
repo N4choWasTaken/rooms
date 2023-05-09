@@ -43,7 +43,7 @@ Auf den Core2 kann der User quittieren, dass er die Fenster geöffnet bzw. gesch
 
 Das backend für den Core2 wurde mit c++ gecoded mit der Arduino library. 
 
-Auf dem Core2 ist implementier:
+Auf dem Core2 ist implementiert:
 Temperatur sowie humidity anzeige
 Einen Button sobald das Fenster geöffnet werden muss/ geschlossen werden muss
 
