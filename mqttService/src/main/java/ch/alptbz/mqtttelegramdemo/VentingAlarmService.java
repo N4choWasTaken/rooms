@@ -30,10 +30,9 @@ public class VentingAlarmService {
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
-				String timeAsString = buildTimeStamp(lastVented);
 				bot.sendVentingAlarmToRandomUser();
 				try {
-					mqttClient.publish("rooms/venting/alarm", timeAsString);
+					mqttClient.publish("rooms/venting", "alarm");
 				} catch (MqttException e) {
 					throw new RuntimeException(e);
 				}
@@ -49,7 +48,6 @@ public class VentingAlarmService {
 			TimerTask task = new TimerTask() {
 				@Override
 				public void run() {
-					String timeAsString = buildTimeStamp(time);
 					bot.sendVentingNotificationToRandomUser();
 					try {
 						mqttClient.publish("rooms/venting", "notification");
@@ -75,9 +73,8 @@ public class VentingAlarmService {
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
-				String timeAsString = buildTimeStamp(closingTime);
 				try {
-					mqttClient.publish("rooms/venting", "alarm");
+					mqttClient.publish("rooms/venting", "close");
 				} catch (MqttException e) {
 					e.printStackTrace();
 				}
@@ -91,8 +88,8 @@ public class VentingAlarmService {
 		Set<Calendar> ventingTimes = new HashSet<>();
 
 		Calendar ventingTime1 = Calendar.getInstance();
-		ventingTime1.set(Calendar.HOUR_OF_DAY, 13);
-		ventingTime1.set(Calendar.MINUTE, 46);
+		ventingTime1.set(Calendar.HOUR_OF_DAY, 8);
+		ventingTime1.set(Calendar.MINUTE, 22);
 		ventingTime1.set(Calendar.SECOND, 0);
 
 		Calendar ventingTime2 = Calendar.getInstance();
@@ -115,15 +112,5 @@ public class VentingAlarmService {
 		ventingTimes.add(ventingTime3);
 		ventingTimes.add(ventingTime4);
 		return ventingTimes;
-	}
-
-	@NotNull
-	private String buildTimeStamp(Calendar time) {
-		String timeAsString = time.get(Calendar.DAY_OF_MONTH) + "-";
-		timeAsString = timeAsString.concat(time.get(Calendar.MONTH) + "-");
-		timeAsString = timeAsString.concat(time.get(Calendar.YEAR) + "-");
-		timeAsString = timeAsString.concat(time.get(Calendar.HOUR_OF_DAY) + "-");
-		timeAsString = timeAsString.concat(String.valueOf(time.get(Calendar.MINUTE)));
-		return timeAsString;
 	}
 }
