@@ -41,6 +41,18 @@ Auf den Core2 kann der User quittieren, dass er die Fenster geöffnet bzw. gesch
 |Fenster geöffnet|`rooms/windows`|`opened`|
 |Fenster geschlossen|`rooms/venting`|`closed`|
 
+Das backend für den Core2 wurde mit c++ gecoded mit der Arduino library. 
+
+Auf dem Core2 ist implementier:
+Temperatur sowie humidity anzeige
+Einen Button sobald das Fenster geöffnet werden muss/ geschlossen werden muss
+
+Im backend selbst ist implementiert:
+Wie oben erwähnt das Lesen sowie Schreiben auf die Topics.
+Dies ist mithilfe des MqttClients möglich welcher die funktion callback sowie die funktion publish beinhaltet. Subscribe um ein Mqtt Topic zu überwachen und falls etwas passiert die callback funktion ausführen und publish um etwas auf das topic zu pushen.
+
+Ebenfalls ist das ganze auslesen der Sensoren sowie die trennung dieser auf verschiedene Topics hier implementiert. Dies haben wir mithilfe der MAC-Adressen unseren Core2 gemacht. Hierbei wird gecheckt welche MAC-Adresse der verbundene Core hat und dann dementsprechend wird das richtige Topic zugewiesen.
+
 
 # Grafana
 
